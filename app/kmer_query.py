@@ -98,7 +98,7 @@ class CARDkmers(object):
                         type_hit = value[hsp]["type_match"]
                         dna = value[hsp]["orf_dna_sequence"]
 
-                        fasta.write(">{orf}__{hsp}__{model}__{type_hit}\n{dna}\n"
+                        fasta.write(">{orf}___{hsp}___{model}___{type_hit}\n{dna}\n"
                                     .format(orf=contig_id, hsp=hsp, model=model, type_hit=type_hit, dna=dna))
 
             except Exception as e:
@@ -124,6 +124,10 @@ class CARDkmers(object):
         if aligner == "":
             os.system("""samtools view -F 4 -F 2048 {bam} | while read line; do awk '{cmd}'; done > {out}"""
                         .format(bam=self.input_bam_file, cmd="""{print ">"$1"__"$4"__"$3"__"$5"\\n"$11}""", out=self.fasta_file))
+        elif  "ID:KMA"  in aligner:
+            print("inside ID:KMA aligner")
+            os.system("""samtools view -F 4 -F 2048 {bam} | while read line; do awk '{cmd}'; done > {out}"""
+                        .format(bam=self.input_bam_file, cmd="""{print ">"$1"___"$4"___"$3"___"$5"\\n"$11}""", out=self.fasta_file))
         else:
             os.system("""samtools view -F 4 -F 2048 {bam} | while read line; do awk '{cmd}'; done > {out}"""
                         .format(bam=self.input_bam_file, cmd="""{print ">"$1"__"$3"__"$2"__"$5"\\n"$10}""", out=self.fasta_file))
@@ -134,7 +138,7 @@ class CARDkmers(object):
         """
         bit-wise flag reference: http://blog.nextgenetics.net/?e=18
         """
-        qname, model, flag, mapq = header.split("__")
+        qname, model, flag, mapq = header.split("___")
 
         if flag.isdigit() is False:
             logger.error("failed to parse BAM file: {}, please check which aligner software was used to produce the BAM file in the RGI BWT step.".format(self.input_bam_file))
