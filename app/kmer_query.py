@@ -117,7 +117,6 @@ class CARDkmers(object):
                     .format(bam=self.input_bam_file, cmd="""{print ">"$1"___"$3"___"$2"___"$5"\\n"$10}""", out=self.fasta_file))
 
 
-
     def get_bwt_alignment_data(self, header):
         """
         bit-wise flag reference: http://blog.nextgenetics.net/?e=18
