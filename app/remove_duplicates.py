@@ -6,6 +6,7 @@ from collections import defaultdict
 from argparse import RawTextHelpFormatter
 from app.settings import APP_NAME, SOFTWARE_VERSION
 
+
 def main(args):
     if args.debug:
         logger.setLevel(10)
@@ -25,10 +26,12 @@ def main(args):
             accession = record.id.split("|")[3].split(":")[1].strip("")
             cl = card_cannonical_lengths[accession]
             pl = len(record.seq)
-            perc = int((pl/cl)*100)
+            perc = int((pl / cl) * 100)
             # if cl > pl and (int(perc) < 90):
             if cl != pl:
-                logger.info("remove: {} -- {} > {} ({})".format(record.id, cl, pl, perc))
+                logger.info(
+                    "remove: {} -- {} > {} ({})".format(record.id, cl, pl, perc)
+                )
                 if record.id not in remove:
                     remove.append(record.id)
             else:
@@ -36,14 +39,23 @@ def main(args):
 
     # write FASTA file
     logger.info("write FASTA file ...")
-    with open(args.output_fasta_file, 'w') as fout:
+    with open(args.output_fasta_file, "w") as fout:
         for seq in dedup_records:
             fout.write(">{}\n{}\n".format(dedup_records[seq][-1], seq))
 
-    logger.info("Number of card cannonical records: {}".format(len(card_cannonical_lengths.keys())))
-    logger.info("Number of prevalence sequences removed based on length of reference: {}".format(len(remove)))
+    logger.info(
+        "Number of card cannonical records: {}".format(
+            len(card_cannonical_lengths.keys())
+        )
+    )
+    logger.info(
+        "Number of prevalence sequences removed based on length of reference: {}".format(
+            len(remove)
+        )
+    )
     logger.info("Saved {} records".format(len(dedup_records)))
     logger.info("Done.")
+
 
 def remove_sub_sequences(records):
     """
@@ -81,13 +93,13 @@ def remove_sub_sequences(records):
     final_records = {}
     for k in recs:
         if recs[k] not in matches:
-           final_records[k] = recs[k]
+            final_records[k] = recs[k]
 
     return final_records
 
 
 def remove_duplicate_sequences(records):
-    """"SeqRecord iterator to removing duplicate sequences."""
+    """ "SeqRecord iterator to removing duplicate sequences."""
     checksums = set()
     all_seqs = []
     for record in records:
@@ -102,18 +114,40 @@ def remove_duplicate_sequences(records):
 
     logger.info("Number of sequences: {}".format(len(all_seqs)))
 
+
 def create_parser():
-    parser = argparse.ArgumentParser(prog="rgi remove_duplicates", description='{} - {} - Remove duplicates \n\nRemoves duplicates sequences from annotationed fasta file.'.format(APP_NAME,SOFTWARE_VERSION), formatter_class=RawTextHelpFormatter)
-    parser.add_argument('-i', '--input', dest="input_fasta_file", required=True, help="input fasta file")
-    parser.add_argument('--card_annotation', dest="card_annotation", required=True, help="card_annotation input fasta file")
-    parser.add_argument('-o', '--output', dest="output_fasta_file", required=True, help="output fasta file")
-    parser.add_argument('--debug', dest="debug", action="store_true", help="debug mode")
+    parser = argparse.ArgumentParser(
+        prog="rgi remove_duplicates",
+        description="{} - {} - Remove duplicates \n\nRemoves duplicates sequences from annotationed fasta file.".format(
+            APP_NAME, SOFTWARE_VERSION
+        ),
+        formatter_class=RawTextHelpFormatter,
+    )
+    parser.add_argument(
+        "-i", "--input", dest="input_fasta_file", required=True, help="input fasta file"
+    )
+    parser.add_argument(
+        "--card_annotation",
+        dest="card_annotation",
+        required=True,
+        help="card_annotation input fasta file",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        dest="output_fasta_file",
+        required=True,
+        help="output fasta file",
+    )
+    parser.add_argument("--debug", dest="debug", action="store_true", help="debug mode")
     return parser
+
 
 def run():
     parser = create_parser()
     args = parser.parse_args()
     main(args)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

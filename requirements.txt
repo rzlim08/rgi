@@ -13,3 +13,4 @@ lxml>=4.9.1
 dask[dataframe]
 pyrodigal>=2.0.0
 setuptools>=47.1.0
+black>=23.12.0
